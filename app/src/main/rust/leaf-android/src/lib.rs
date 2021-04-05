@@ -11,7 +11,7 @@ pub unsafe extern "C" fn Java_com_leaf_example_aleaf_SimpleVpnService_runLeaf(
     configPath: JString,
     protect_path: JString,
 ) {
-    leaf_mobile::run_leaf(
+    leaf_ffi::run_leaf(
         env.get_string(configPath).expect("invalid path").as_ptr(),
         env.get_string(protect_path).expect("invalid path").as_ptr(),
     );

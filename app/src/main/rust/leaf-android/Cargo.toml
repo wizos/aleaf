@@ -11,9 +11,9 @@ crate-type = ["dylib"]
 
 [features]
 default = [
-    "leaf-mobile/default-ring"
+    "leaf-ffi/default-ring"
 ]
 
 [dependencies]
-leaf-mobile = { git = "https://github.com/eycorsican/leaf.git", package = "leaf-mobile", default-features = false }
+leaf-ffi = { git = "https://github.com/eycorsican/leaf.git", package = "leaf-ffi", default-features = false }
 jni = { version = "0.19", default-features = false }
