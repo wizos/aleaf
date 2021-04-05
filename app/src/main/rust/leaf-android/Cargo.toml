@@ -11,9 +11,11 @@ crate-type = ["dylib"]
 
 [features]
 default = [
-    "leaf-ffi/default-ring"
+    "leaf/default-ring"
 ]
 
 [dependencies]
-leaf-ffi = { git = "https://github.com/eycorsican/leaf.git", package = "leaf-ffi", default-features = false }
+leaf = { git = "https://github.com/eycorsican/leaf.git", package = "leaf", default-features = false }
 jni = { version = "0.19", default-features = false }
+tokio = { version = "1", features = ["macros", "rt"] }
+futures = "0.3"

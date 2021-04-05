@@ -8,11 +8,29 @@ use jni::{
 pub unsafe extern "C" fn Java_com_leaf_example_aleaf_SimpleVpnService_runLeaf(
     env: JNIEnv,
     _: JClass,
-    configPath: JString,
+    config_path: JString,
     protect_path: JString,
 ) {
-    leaf_ffi::run_leaf(
-        env.get_string(configPath).expect("invalid path").as_ptr(),
-        env.get_string(protect_path).expect("invalid path").as_ptr(),
-    );
+    let config_path = env
+        .get_string(config_path)
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .to_owned();
+    let protect_path = env
+        .get_string(protect_path)
+        .unwrap()
+        .to_str()
+        .unwrap()
+        .to_owned();
+    let rt = tokio::runtime::Builder::new_current_thread()
+        .enable_all()
+        .build()
+        .unwrap();
+    rt.block_on(leaf::proxy::set_socket_protect_path(
+        protect_path.to_string(),
+    ));
+    let config = leaf::config::from_file(&config_path).unwrap();
+    let runners = leaf::util::prepare(config).unwrap();
+    rt.block_on(futures::future::join_all(runners));
 }

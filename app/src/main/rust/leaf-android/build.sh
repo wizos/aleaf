@@ -24,11 +24,11 @@ for target in x86_64-linux-android aarch64-linux-android; do
             mkdir -p "$BASE/../../jniLibs/x86_64/"
 			case $mode in
 				'release')
-					cargo build --target $target --manifest-path "$BASE/Cargo.toml" --no-default-features --features "leaf-ffi/default-openssl" --release
+					cargo build --target $target --manifest-path "$BASE/Cargo.toml" --no-default-features --features "leaf/default-openssl" --release
 					cp "$BASE/target/$target/release/libleafandroid.so" "$BASE/../../jniLibs/x86_64/"
 					;;
 				*)
-					cargo build --target $target --manifest-path "$BASE/Cargo.toml" --no-default-features --features "leaf-ffi/default-openssl"
+					cargo build --target $target --manifest-path "$BASE/Cargo.toml" --no-default-features --features "leaf/default-openssl"
 					cp "$BASE/target/$target/debug/libleafandroid.so" "$BASE/../../jniLibs/x86_64/"
 					;;
 			esac
@@ -42,11 +42,11 @@ for target in x86_64-linux-android aarch64-linux-android; do
             mkdir -p "$BASE/../../jniLibs/arm64-v8a/"
 			case $mode in
 				'release')
-					cargo build --target $target --manifest-path "$BASE/Cargo.toml" --no-default-features --features "leaf-ffi/default-openssl" --release
+					cargo build --target $target --manifest-path "$BASE/Cargo.toml" --no-default-features --features "leaf/default-openssl" --release
 					cp "$BASE/target/$target/release/libleafandroid.so" "$BASE/../../jniLibs/arm64-v8a/"
 					;;
 				*)
-					cargo build --target $target --manifest-path "$BASE/Cargo.toml" --no-default-features --features "leaf-ffi/default-openssl"
+					cargo build --target $target --manifest-path "$BASE/Cargo.toml" --no-default-features --features "leaf/default-openssl"
 					cp "$BASE/target/$target/debug/libleafandroid.so" "$BASE/../../jniLibs/arm64-v8a/"
 					;;
 			esac
