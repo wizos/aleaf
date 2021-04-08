@@ -25,11 +25,11 @@ for target in x86_64-linux-android aarch64-linux-android; do
 			mkdir -p "$BASE/../../jniLibs/x86_64/"
 			case $mode in
 				'release')
-					cargo build --target $target --manifest-path "$BASE/Cargo.toml" --no-default-features --features "leaf/default-openssl" --release
+					cargo build --target $target --manifest-path "$BASE/Cargo.toml" --no-default-features --features "leaf/default-ring" --release
 					cp "$BASE/target/$target/release/libleafandroid.so" "$BASE/../../jniLibs/x86_64/"
 					;;
 				*)
-					cargo build --target $target --manifest-path "$BASE/Cargo.toml" --no-default-features --features "leaf/default-openssl"
+					cargo build --target $target --manifest-path "$BASE/Cargo.toml" --no-default-features --features "leaf/default-ring"
 					cp "$BASE/target/$target/debug/libleafandroid.so" "$BASE/../../jniLibs/x86_64/"
 					;;
 			esac
