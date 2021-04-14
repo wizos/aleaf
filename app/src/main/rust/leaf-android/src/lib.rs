@@ -23,14 +23,19 @@ pub unsafe extern "C" fn Java_com_leaf_example_aleaf_SimpleVpnService_runLeaf(
         .to_str()
         .unwrap()
         .to_owned();
-    let rt = tokio::runtime::Builder::new_current_thread()
-        .enable_all()
-        .build()
-        .unwrap();
-    rt.block_on(leaf::proxy::set_socket_protect_path(
-        protect_path.to_string(),
-    ));
-    let config = leaf::config::from_file(&config_path).unwrap();
-    let runners = leaf::util::prepare(config).unwrap();
-    rt.block_on(futures::future::join_all(runners));
+    let opts = leaf::StartOptions {
+        config: leaf::Config::File(config_path),
+        socket_protect_path: Some(protect_path),
+        runtime_opt: leaf::RuntimeOption::SingleThread,
+    };
+    leaf::start(0, opts).unwrap();
+}
+
+#[allow(non_snake_case)]
+#[no_mangle]
+pub unsafe extern "C" fn Java_com_leaf_example_aleaf_SimpleVpnService_stopLeaf(
+    _: JNIEnv,
+    _: JClass,
+) {
+    leaf::shutdown(0);
 }

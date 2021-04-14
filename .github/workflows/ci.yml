@@ -14,7 +14,7 @@ jobs:
       - name: install rust toolchain
         uses: hecrj/setup-rust-action@v1
         with:
-          rust-version: nightly
+          rust-version: stable
 
       - name: install deps
         run: |
@@ -22,7 +22,7 @@ jobs:
 
       - name: build
         run: |
-          export RUSTFLAGS="-Z strip=symbols"
+          # export RUSTFLAGS="-Z strip=symbols"
           export ANDROID_HOME=/tmp/Android/sdk
           export NDK_HOME=/tmp/Android/sdk/ndk-bundle
           export PATH=$ANDROID_HOME/cmdline-tools/bin:$PATH
