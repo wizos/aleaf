@@ -8,17 +8,25 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
+
+    var running = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
 
         findViewById<FloatingActionButton>(R.id.fab).setOnClickListener { view ->
-            val intent = VpnService.prepare(this)
-            if (intent != null) {
-                startActivityForResult(intent, 1)
+            if (running) {
+                sendBroadcast(Intent("signal_stop_vpn"))
+                running = false
             } else {
-                onActivityResult(1, Activity.RESULT_OK, null);
+                val intent = VpnService.prepare(this)
+                if (intent != null) {
+                    startActivityForResult(intent, 1)
+                } else {
+                    onActivityResult(1, Activity.RESULT_OK, null);
+                }
             }
         }
     }
@@ -27,6 +35,7 @@ class MainActivity : AppCompatActivity() {
         if (resultCode == RESULT_OK) {
             val intent = Intent(this, SimpleVpnService::class.java)
             startService(intent)
+            running = true
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }

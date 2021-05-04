@@ -797,7 +797,7 @@ checksum = "830d08ce1d1d941e6b30645f1a0eb5643013d835ce3779a5fc208261dbe10f55"
 [[package]]
 name = "leaf"
 version = "0.1.2"
-source = "git+https://github.com/eycorsican/leaf.git#de4de722b15fc44d7f7d5c9919597e5923644c19"
+source = "git+https://github.com/eycorsican/leaf.git#a46e3007aecb87ad52b08b9ca087d9d6ac51b617"
 dependencies = [
  "aes",
  "anyhow",
