@@ -38,8 +38,7 @@ jobs:
           sdkmanager --sdk_root=$ANDROID_HOME "ndk-bundle" "platforms;android-21"
           cd $WD
           # add targets
-          rustup target add aarch64-linux-android x86_64-linux-android i686-linux-android armv7-linux-androideabi
-          
+          rustup target add aarch64-linux-android x86_64-linux-android
           # build
           ./app/src/main/rust/leaf-android/build.sh release
 
@@ -47,8 +46,6 @@ jobs:
         run: |
           cp app/src/main/rust/leaf-android/target/x86_64-linux-android/release/libleafandroid.so libleafandroid-x86_64-linux-android.so
           cp app/src/main/rust/leaf-android/target/aarch64-linux-android/release/libleafandroid.so libleafandroid-aarch64-linux-android.so
-          cp app/src/main/rust/leaf-android/target/armv7-linux-androideabi/release/libleafandroid.so libleafandroid-armv7-linux-android.so
-          cp app/src/main/rust/leaf-android/target/i686-linux-android/release/libleafandroid.so libleafandroid-i686-linux-android.so
 
       - name: upload assets
         uses: actions/upload-artifact@v2
@@ -61,17 +58,3 @@ jobs:
         with:
           name: libleafandroid-aarch64-linux-android.so
           path: libleafandroid-aarch64-linux-android.so
-
-      - name: upload assets
-        uses: actions/upload-artifact@v2
-        with:
-          name: libleafandroid-armv7-linux-android.so
-          path: libleafandroid-armv7-linux-android.so
-          
-
-      - name: upload assets
-        uses: actions/upload-artifact@v2
-        with:
-          name: libleafandroid-i686-linux-android.so
-          path: libleafandroid-i686-linux-android.so
-          
