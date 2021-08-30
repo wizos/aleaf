@@ -9,7 +9,6 @@ pub unsafe extern "C" fn Java_com_leaf_example_aleaf_SimpleVpnService_runLeaf(
     env: JNIEnv,
     _: JClass,
     config_path: JString,
-    protect_path: JString,
 ) {
     let config_path = env
         .get_string(config_path)
@@ -17,15 +16,8 @@ pub unsafe extern "C" fn Java_com_leaf_example_aleaf_SimpleVpnService_runLeaf(
         .to_str()
         .unwrap()
         .to_owned();
-    let protect_path = env
-        .get_string(protect_path)
-        .unwrap()
-        .to_str()
-        .unwrap()
-        .to_owned();
     let opts = leaf::StartOptions {
         config: leaf::Config::File(config_path),
-        socket_protect_path: Some(protect_path),
         runtime_opt: leaf::RuntimeOption::SingleThread,
     };
     leaf::start(0, opts).unwrap();

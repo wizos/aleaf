@@ -2,6 +2,10 @@
 
 Shows how to build a VPN app for Android using [leaf](https://github.com/eycorsican/leaf).
 
+## Download
+
+<a href="https://play.google.com/store/apps/details?id=com.leaf.example.aleaf"><img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" height="100"></a>
+
 ## Dependencies
 
 * Rust
