@@ -18,7 +18,7 @@ pub unsafe extern "C" fn Java_com_leaf_example_aleaf_SimpleVpnService_runLeaf(
         .to_owned();
     let opts = leaf::StartOptions {
         config: leaf::Config::File(config_path),
-        runtime_opt: leaf::RuntimeOption::SingleThread,
+        runtime_opt: leaf::RuntimeOption::MultiThreadAuto(1 * 1024 * 1024),
     };
     leaf::start(0, opts).unwrap();
 }

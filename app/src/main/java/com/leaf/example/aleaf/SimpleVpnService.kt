@@ -1,14 +1,23 @@
 package com.leaf.example.aleaf
 
+import android.annotation.TargetApi
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.net.LocalServerSocket
 import android.net.LocalSocket
 import android.net.LocalSocketAddress
 import android.net.VpnService
+import android.os.Build
 import android.system.Os.setenv
+import androidx.core.app.NotificationCompat
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -37,6 +46,7 @@ class SimpleVpnService: VpnService() {
         // protectSocket.close()
         // protectThread.interrupt()
 
+        stopForeground(true)
         stopSelf()
         running.set(false)
         sendBroadcast(Intent("vpn_stopped"))
@@ -57,14 +67,66 @@ class SimpleVpnService: VpnService() {
         }
     }
 
+    fun startForground() {
+        @TargetApi(Build.VERSION_CODES.O)
+        fun createNotificationChannel(channelId: String, channelName: String): String {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val chan = NotificationChannel(channelId,
+                    channelName, NotificationManager.IMPORTANCE_LOW)
+                chan.lightColor = Color.BLUE
+                chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+                val service = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                service.createNotificationChannel(chan)
+                return channelId
+            }
+            return ""
+        }
+
+        val channelId =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                createNotificationChannel(getString(R.string.app_name), getString(R.string.app_name))
+            } else {
+                // If earlier version channel ID is not used
+                // https://developer.android.com/reference/android/support/v4/app/NotificationCompat.Builder.html#NotificationCompat.Builder(android.content.Context)
+                ""
+            }
+
+        val intent = Intent()
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent, 0)
+
+        val builder = NotificationCompat.Builder(this, channelId)
+
+        builder.setWhen(System.currentTimeMillis())
+        builder.setSmallIcon(R.drawable.ic_launcher_foreground)
+        val largeIconBitmap = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher)
+        builder.setLargeIcon(largeIconBitmap)
+        builder.priority = NotificationCompat.PRIORITY_LOW
+        builder.setFullScreenIntent(pendingIntent, true)
+
+        val stopIntent = Intent(this, SimpleVpnService::class.java)
+        stopIntent.action = "stop_vpn_action"
+        val pendingPrevIntent = PendingIntent.getService(this, 0, stopIntent, 0)
+        val prevAction = NotificationCompat.Action(android.R.drawable.ic_media_pause, "Stop", pendingPrevIntent)
+        builder.addAction(prevAction)
+
+        val bigTextStyle = NotificationCompat.BigTextStyle()
+        bigTextStyle.setBigContentTitle("Leaf")
+        builder.setStyle(bigTextStyle)
+
+        val notification = builder.build()
+        startForeground(1, notification)
+    }
+
     override fun onCreate() {
         super.onCreate()
+        startForground()
         registerReceiver(broadcastReceiver, IntentFilter("vpn_ping"))
         registerReceiver(broadcastReceiver, IntentFilter("stop_vpn"))
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        stopVpn()
         unregisterReceiver(broadcastReceiver)
     }
 
@@ -74,7 +136,19 @@ class SimpleVpnService: VpnService() {
             return START_NOT_STICKY
         }
 
-        if (!this::protectThread.isInitialized) {
+        intent?.let {
+            when (it.action) {
+                "stop_vpn_action" -> {
+                    println("Stop from notification action.")
+                    stopVpn()
+                    return START_NOT_STICKY
+                }
+                else -> {
+                }
+            }
+        }
+
+        if (!this::protectThread.isInitialized || protectThread.state == Thread.State.TERMINATED) {
             protectThread = thread(start = true) {
                 protectPath =
                     File.createTempFile("leaf_vpn_socket_protect", ".sock", cacheDir).absolutePath
@@ -119,7 +193,7 @@ class SimpleVpnService: VpnService() {
         }
 
         leafThread = thread(start = true) {
-            val tunFd = Builder().setSession("leaf")
+            val tunFd = Builder().setSession("Leaf")
                 .setMtu(1500)
                 .addAddress("10.255.0.1", 30)
                 .addDnsServer("1.1.1.1")
@@ -186,6 +260,6 @@ class SimpleVpnService: VpnService() {
         }
         running.set(true)
         sendBroadcast(Intent("vpn_started"))
-        return START_NOT_STICKY
+        return START_STICKY
     }
 }

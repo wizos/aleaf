@@ -22,11 +22,7 @@ class MainActivity : AppCompatActivity() {
                     running = false
                     findViewById<Button>(R.id.go).text = "Go"
                 }
-                "vpn_started" -> {
-                    running = true
-                    findViewById<Button>(R.id.go).text = "Stop"
-                }
-                "vpn_pong" -> {
+                "vpn_started", "vpn_pong" -> {
                     running = true
                     findViewById<Button>(R.id.go).text = "Stop"
                 }
