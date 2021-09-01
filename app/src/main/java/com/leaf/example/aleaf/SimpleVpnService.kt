@@ -38,19 +38,27 @@ class SimpleVpnService: VpnService() {
     }
 
     private external fun runLeaf(configPath: String)
-    private external fun stopLeaf()
+    private external fun stopLeaf(): Boolean
+    private external fun isLeafRunning(): Boolean
 
     private fun stopVpn() {
-        stopLeaf()
-        // leafThread.interrupt()
+        thread(start = true) {
+            stopLeaf()
+            while (true) {
+                if (!isLeafRunning()) {
+                    break
+                }
+                Thread.sleep(200)
+            }
 
-        protectServer.close()
-        protectThread.interrupt()
+            protectServer.close()
+            protectThread.interrupt()
 
-        stopForeground(true)
-        stopSelf()
-        running.set(false)
-        sendBroadcast(Intent("vpn_stopped"))
+            stopForeground(true)
+            stopSelf()
+            running.set(false)
+            sendBroadcast(Intent("vpn_stopped"))
+        }
     }
 
     private val broadcastReceiver = object : BroadcastReceiver() {
@@ -127,7 +135,7 @@ class SimpleVpnService: VpnService() {
 
     override fun onDestroy() {
         super.onDestroy()
-        stopVpn()
+//        stopVpn()
         unregisterReceiver(broadcastReceiver)
     }
 
@@ -197,7 +205,7 @@ class SimpleVpnService: VpnService() {
             var configFile = File(filesDir, "config.conf")
             var configContent = """
             [General]
-            loglevel = warn
+            loglevel = info
             dns-server = 114.114.114.114, 223.5.5.5
             routing-domain-resolve = true
             tun-fd = REPLACE-ME-WITH-THE-FD
@@ -253,8 +261,18 @@ class SimpleVpnService: VpnService() {
 
             println("leaf thread exit")
         }
-        running.set(true)
-        sendBroadcast(Intent("vpn_started"))
+
+        thread(start = true) {
+            while (true) {
+                if (isLeafRunning()) {
+                    running.set(true)
+                    sendBroadcast(Intent("vpn_started"))
+                    return@thread
+                }
+                Thread.sleep(200)
+            }
+        }
+
         return START_STICKY
     }
 }

@@ -1,6 +1,6 @@
 use jni::{
     objects::{JClass, JString},
-    JNIEnv,
+    sys, JNIEnv,
 };
 
 #[allow(non_snake_case)]
@@ -28,6 +28,23 @@ pub unsafe extern "C" fn Java_com_leaf_example_aleaf_SimpleVpnService_runLeaf(
 pub unsafe extern "C" fn Java_com_leaf_example_aleaf_SimpleVpnService_stopLeaf(
     _: JNIEnv,
     _: JClass,
-) {
-    leaf::shutdown(0);
+) -> sys::jboolean {
+    if leaf::shutdown(0) {
+        sys::JNI_TRUE
+    } else {
+        sys::JNI_FALSE
+    }
+}
+
+#[allow(non_snake_case)]
+#[no_mangle]
+pub unsafe extern "C" fn Java_com_leaf_example_aleaf_SimpleVpnService_isLeafRunning(
+    _: JNIEnv,
+    _: JClass,
+) -> sys::jboolean {
+    if leaf::is_running(0) {
+        sys::JNI_TRUE
+    } else {
+        sys::JNI_FALSE
+    }
 }

@@ -13,17 +13,20 @@ import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
 
-    private var running = false
+    private var state = State.STOPPED
 
+    private enum class State {
+        STARTING, STARTED, STOPPING, STOPPED
+    }
     val broadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             when (intent?.action) {
                 "vpn_stopped" -> {
-                    running = false
+                    state = State.STOPPED
                     findViewById<Button>(R.id.go).text = "Go"
                 }
                 "vpn_started", "vpn_pong" -> {
-                    running = true
+                    state = State.STARTED
                     findViewById<Button>(R.id.go).text = "Stop"
                 }
             }
@@ -34,12 +37,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
+        findViewById<Button>(R.id.go).text = "Go"
 
         findViewById<Button>(R.id.go).setOnClickListener { view ->
-            if (running) {
+            if (state == State.STARTED) {
+                state = State.STOPPING
+                findViewById<Button>(R.id.go).text = "Disconnecting"
                 sendBroadcast(Intent("stop_vpn"))
-                running = false
-            } else {
+            } else if (state == State.STOPPED) {
+                state = State.STARTING
+                findViewById<Button>(R.id.go).text = "Connecting"
                 val intent = VpnService.prepare(this)
                 if (intent != null) {
                     startActivityForResult(intent, 1)
